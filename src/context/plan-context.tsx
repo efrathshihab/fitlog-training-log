@@ -21,6 +21,10 @@ function cleanIds(value: unknown): number[] {
   return Array.isArray(value) ? [...new Set(value.filter((id): id is number => Number.isSafeInteger(id) && id > 0))] : [];
 }
 
+function persist(planIds: number[], savedIds: number[], doneIds: number[]) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ planIds, savedIds, doneIds })); } catch { /* Storage may be disabled. */ }
+}
+
 export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [planIds, setPlanIds] = useState<number[]>([]);
   const [savedIds, setSavedIds] = useState<number[]>([]);
@@ -46,28 +50,35 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ planIds, savedIds, doneIds })); } catch { /* Storage may be disabled. */ }
+    persist(planIds, savedIds, doneIds);
   }, [hydrated, planIds, savedIds, doneIds]);
 
   const addToPlan = useCallback((id: number) => {
     if (planIds.includes(id)) return "already" as const;
     if (planIds.length >= 5) return "full" as const;
-    setPlanIds((current) => [...current, id]);
+    const next = [...planIds, id];
+    setPlanIds(next);
+    persist(next, savedIds, doneIds);
     return "added" as const;
-  }, [planIds]);
+  }, [planIds, savedIds, doneIds]);
 
   const saveForLater = useCallback((id: number) => {
     if (savedIds.includes(id)) return "already" as const;
-    setSavedIds((current) => [...current, id]);
+    const next = [...savedIds, id];
+    setSavedIds(next);
+    persist(planIds, next, doneIds);
     return "saved" as const;
-  }, [savedIds]);
+  }, [planIds, savedIds, doneIds]);
 
-  const removeFromPlan = useCallback((id: number) => setPlanIds((current) => current.filter((item) => item !== id)), []);
-  const removeSaved = useCallback((id: number) => setSavedIds((current) => current.filter((item) => item !== id)), []);
+  const removeFromPlan = useCallback((id: number) => { const next = planIds.filter((item) => item !== id); setPlanIds(next); persist(next, savedIds, doneIds); }, [planIds, savedIds, doneIds]);
+  const removeSaved = useCallback((id: number) => { const next = savedIds.filter((item) => item !== id); setSavedIds(next); persist(planIds, next, doneIds); }, [planIds, savedIds, doneIds]);
   const markDone = useCallback((id: number) => {
-    setDoneIds((current) => current.includes(id) ? current : [...current, id]);
-    setPlanIds((current) => current.filter((item) => item !== id));
-  }, []);
+    const nextDone = doneIds.includes(id) ? doneIds : [...doneIds, id];
+    const nextPlan = planIds.filter((item) => item !== id);
+    setDoneIds(nextDone);
+    setPlanIds(nextPlan);
+    persist(nextPlan, savedIds, nextDone);
+  }, [planIds, savedIds, doneIds]);
 
   const value = useMemo(() => ({ planIds, savedIds, doneIds, hydrated, addToPlan, saveForLater, removeFromPlan, removeSaved, markDone }),
     [planIds, savedIds, doneIds, hydrated, addToPlan, saveForLater, removeFromPlan, removeSaved, markDone]);

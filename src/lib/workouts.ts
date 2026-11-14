@@ -30,8 +30,10 @@ function isWorkout(value: unknown): value is Workout {
 }
 
 export class WorkoutFetchError extends Error {
-  constructor(public readonly missing = false) {
+  readonly missing: boolean;
+  constructor(missing = false) {
     super(missing ? "Workout not found" : "Unable to load workouts");
+    this.missing = missing;
   }
 }
 
@@ -55,11 +57,11 @@ async function request<T>(path: string, validate: (value: unknown) => value is T
 }
 
 export async function getWorkouts(): Promise<Workout[]> {
-  const result = await request("", (value): value is { value: Workout[] } => {
-    const list = (value as { value?: unknown } | null)?.value;
+  const result = await request("", (value): value is Workout[] | { value: Workout[] } => {
+    const list = Array.isArray(value) ? value : (value as { value?: unknown } | null)?.value;
     return Array.isArray(list) && list.every(isWorkout);
   });
-  return result.value;
+  return Array.isArray(result) ? result : result.value;
 }
 
 export async function getWorkout(id: number): Promise<Workout> {
