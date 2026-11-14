@@ -2,12 +2,12 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const badgeVariants = cva("inline-flex items-center rounded-sm border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[.12em]", {
+const badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase leading-4", {
   variants: {
     variant: {
-      default: "border-[#d5ff29] bg-[#d5ff29] text-[#111]",
+      default: "border-[#c2f800] bg-[#c2f800] text-[#0f1115]",
       outline: "border-[#414854] bg-transparent text-[#c6cbd2]",
-      subtle: "border-[#414a36] bg-[#28301d] text-[#d5ff29]",
+      subtle: "border-[#414a36] bg-[#28301d] text-[#c2f800]",
     },
   },
   defaultVariants: { variant: "outline" },

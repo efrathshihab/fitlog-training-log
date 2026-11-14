@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Check, ChevronDown, Clock3, Dumbbell, Flame, ListChecks, X } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,27 +15,26 @@ type Tab = "plan" | "saved";
 type SortKey = "duration" | "calories" | "rating";
 
 function PlanRow({ workout, tab, onDone, onRemove }: { workout: Workout; tab: Tab; onDone: (workout: Workout) => void; onRemove: (workout: Workout) => void }) {
-  return <article className="panel flex flex-col gap-4 rounded-sm p-3 sm:flex-row sm:items-center sm:p-4">
-    <div className="image-panel relative h-44 w-full shrink-0 rounded-sm sm:size-[80px] lg:size-[84px]"><Image src={workout.image} alt={`${workout.name} exercise`} fill unoptimized sizes="(max-width: 640px) 100vw, 84px" className="object-cover" /></div>
+  return <article className="flex flex-col gap-4 rounded-2xl border border-[#232732] bg-[#14171e] p-4 sm:grid sm:grid-cols-[144px_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-2 lg:flex lg:min-h-[114px] lg:items-center lg:gap-4">
+    <div className="image-panel relative h-44 w-full shrink-0 rounded-xl sm:h-20 sm:w-36"><Image src={workout.image} alt={`${workout.name} exercise`} fill unoptimized sizes="(max-width: 640px) 100vw, 144px" className="object-cover" /></div>
     <div className="min-w-0 flex-1">
-      <h3 className="font-display text-[26px] font-extrabold uppercase leading-none tracking-wide">{workout.name}</h3>
-      <p className="mt-2 flex items-center gap-1.5 text-xs text-[#9aa3ac]"><Dumbbell size={13} />{workout.equipment}</p>
-      <div className="mt-3"><WorkoutStats workout={workout} compact /></div>
+      <h3 className="font-display text-base font-bold uppercase leading-6">{workout.name}</h3>
+      <p className="mt-0.5 text-xs font-semibold leading-4 text-[#8a92a0]">{workout.equipment}</p>
+      <div className="mt-1.5"><WorkoutStats workout={workout} compact /></div>
     </div>
-    <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-      <Button variant="outline" size="sm" asChild><Link href={`/workouts/${workout.id}`}>View Details</Link></Button>
-      {tab === "plan" && <Button variant="secondary" size="sm" onClick={() => onDone(workout)}><Check size={15} /> Mark as Done</Button>}
-      <Button variant="ghost" size="icon" onClick={() => onRemove(workout)} aria-label={`Remove ${workout.name} from ${tab === "plan" ? "today's plan" : "saved workouts"}`} title="Remove"><X size={18} /></Button>
+    <div className="flex flex-wrap items-center gap-3 sm:col-start-2 lg:justify-end">
+      <Button variant="outline" asChild className="h-[34px] rounded-full px-[18px] text-xs font-normal"><Link href={`/workouts/${workout.id}`}>View Details</Link></Button>
+      {tab === "plan" && <Button onClick={() => onDone(workout)} className="h-8 rounded-full px-4 text-xs font-semibold"><Check size={14} /> Mark as Done</Button>}
+      <Button variant="ghost" size="icon" className="size-7 rounded-full" onClick={() => onRemove(workout)} aria-label={`Remove ${workout.name} from ${tab === "plan" ? "today's plan" : "saved workouts"}`} title="Remove"><X size={16} /></Button>
     </div>
   </article>;
 }
 
-function EmptyState({ tab }: { tab: Tab }) {
-  return <div className="panel flex min-h-[300px] flex-col items-center justify-center rounded-sm px-5 py-10 text-center">
-    <span className="mb-5 flex size-12 items-center justify-center rounded-full border border-[#424b35] bg-[#242c1c] text-[#d5ff29]">{tab === "plan" ? <ListChecks size={24} /> : <Bookmark size={24} />}</span>
-    <h2 className="display text-4xl">Nothing here yet</h2>
-    <p className="muted mt-3 max-w-sm text-sm">Browse the library and add a lift to get today moving.</p>
-    <Button asChild className="mt-6"><Link href="/#library">Go to workouts</Link></Button>
+function EmptyState() {
+  return <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-[#2a2e36] bg-[#111317] px-4 text-center">
+    <h2 className="display text-xl leading-5">Nothing here yet</h2>
+    <p className="mt-2 max-w-sm text-xs leading-4 text-[#a1a1aa]">Browse the library and add a lift to get today moving.</p>
+    <Button asChild className="mt-6 h-9 rounded-full bg-[#c2f10d] px-6 text-xs font-semibold"><Link href="/#library">Go to workouts</Link></Button>
   </div>;
 }
 
@@ -82,22 +81,22 @@ export default function MyPlanPage() {
     toast.success(`${workout.name} removed from ${tab === "plan" ? "today's plan" : "saved workouts"}.`);
   }
 
-  return <section className="container-page min-h-[630px] pb-20 pt-10 sm:pt-12">
-    <div><p className="eyebrow mb-3">Your training log</p><h1 className="display text-5xl sm:text-6xl">My Plan</h1><p className="muted mt-2 text-sm">Cap of five lifts for today. Finish them, then load more.</p></div>
-    <div className="mt-8 grid grid-cols-1 gap-3 rounded-sm border border-[#2d333d] bg-[#13161d] p-4 sm:grid-cols-3 sm:gap-0 sm:p-0">
+  return <section className="container-plan pb-10 pt-10">
+    <div><h1 className="display text-[30px] leading-9">My Plan</h1><p className="mt-2 text-sm leading-5 text-[#8a92a0]">Cap of five lifts for today. Finish them, then load more.</p></div>
+    <div className="mt-6 grid grid-cols-1 rounded-2xl border border-[#232732] bg-[#13161d] px-6 py-5 sm:h-[122px] sm:grid-cols-3 sm:gap-0 sm:px-0 sm:py-0">
       {[
-        { label: "Exercises", value: planned.length, icon: ListChecks },
-        { label: "Minutes", value: totals.minutes, icon: Clock3 },
-        { label: "Calories", value: totals.calories, icon: Flame },
-      ].map(({ label, value, icon: Icon }) => <div key={label} className="flex items-center gap-4 border-b border-[#303640] p-3 last:border-0 sm:border-b-0 sm:border-r sm:p-7 sm:last:border-r-0"><span className="flex size-11 shrink-0 items-center justify-center rounded-sm bg-[#27301d] text-[#d5ff29]"><Icon size={21} /></span><div><p className="text-[11px] font-extrabold uppercase tracking-[.15em] text-[#8f98a3]">{label}</p><p className="font-display text-4xl font-extrabold leading-none">{value}</p></div></div>)}
+        { label: "Exercises", value: planned.length },
+        { label: "Minutes", value: totals.minutes },
+        { label: "Calories", value: totals.calories },
+      ].map(({ label, value }, index) => <div key={label} className="border-b border-[#232732] py-3 last:border-0 sm:border-b-0 sm:border-r sm:py-8 sm:pl-8 sm:first:pl-6 sm:last:border-r-0"><p className="text-xs leading-4 text-[#8a92a0]">{label}</p><p className={`font-display mt-1 text-4xl font-bold leading-10 ${index === 0 ? "text-[#ccff00]" : "text-white"}`}>{value}</p></div>)}
     </div>
     <Tabs value={tab} onValueChange={(value) => setTab(value as Tab)} className="mt-6">
-      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <TabsList className="w-full sm:w-auto"><TabsTrigger value="plan" className="flex-1 sm:flex-none">Today&apos;s Plan <span className="ml-1 opacity-70">({planIds.length})</span></TabsTrigger><TabsTrigger value="saved" className="flex-1 sm:flex-none">Saved <span className="ml-1 opacity-70">({savedIds.length})</span></TabsTrigger></TabsList>
-        <label className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-[#9ca4ae]">Sort By <span className="relative"><select value={sort} onChange={(event) => setSort(event.target.value as SortKey)} className="h-11 min-w-36 appearance-none rounded-sm border border-[#3a424b] bg-[#191d24] pl-4 pr-10 text-sm font-bold normal-case tracking-normal text-white focus:outline-none focus:ring-2 focus:ring-[#d5ff29]" aria-label="Sort workouts by"><option value="duration">Duration</option><option value="calories">Calories</option><option value="rating">Rating</option></select><ChevronDown size={16} className="pointer-events-none absolute right-3 top-3.5 text-[#aab1b9]" /></span></label>
+      <div className="mb-6 flex flex-col gap-4 sm:h-12 sm:flex-row sm:items-end sm:justify-between">
+        <TabsList className="w-full sm:w-auto"><TabsTrigger value="plan" className="flex-1 data-[state=active]:sm:w-[108px] data-[state=inactive]:sm:w-[103px] sm:flex-none">Today&apos;s Plan</TabsTrigger><TabsTrigger value="saved" className="flex-1 data-[state=active]:sm:w-[108px] data-[state=inactive]:sm:w-[68px] sm:flex-none">Saved</TabsTrigger></TabsList>
+        <label className="flex items-center gap-3 text-xs font-normal text-[#8a92a0] sm:mb-[3px]">Sort By <span className="relative"><select value={sort} onChange={(event) => setSort(event.target.value as SortKey)} className="h-[34px] w-[93px] appearance-none rounded-[9px] border border-[#232732] bg-[#13161d] pl-3 pr-6 text-xs font-normal text-white focus:outline-none focus:ring-2 focus:ring-[#c2f800]" aria-label="Sort workouts by"><option value="duration">Duration</option><option value="calories">Calories</option><option value="rating">Rating</option></select><ChevronDown size={14} className="pointer-events-none absolute right-2.5 top-2.5 text-[#8a92a0]" /></span></label>
       </div>
       {(["plan", "saved"] as const).map((currentTab) => <TabsContent value={currentTab} key={currentTab}>
-        {loading || !hydrated ? <div className="panel flex min-h-[230px] flex-col items-center justify-center gap-4 rounded-sm" role="status"><span className="spinner" /><span className="text-sm text-[#b3b9c0]">Loading workouts…</span></div> : error ? <div className="panel flex min-h-[230px] flex-col items-center justify-center gap-4 rounded-sm px-5 text-center" role="alert"><p className="muted text-sm">{error}</p><Button onClick={() => void load()}>Try again</Button></div> : items.length ? <div className="space-y-4">{items.map((workout) => <PlanRow key={workout.id} workout={workout} tab={currentTab} onDone={handleDone} onRemove={handleRemove} />)}</div> : <EmptyState tab={currentTab} />}
+        {loading || !hydrated ? <div className="panel flex min-h-[230px] flex-col items-center justify-center gap-4 rounded-xl" role="status"><span className="spinner" /><span className="text-sm text-[#b3b9c0]">Loading workouts…</span></div> : error ? <div className="panel flex min-h-[230px] flex-col items-center justify-center gap-4 rounded-xl px-5 text-center" role="alert"><p className="muted text-sm">{error}</p><Button onClick={() => void load()}>Try again</Button></div> : items.length ? <div className="space-y-4">{items.map((workout) => <PlanRow key={workout.id} workout={workout} tab={currentTab} onDone={handleDone} onRemove={handleRemove} />)}</div> : <EmptyState />}
       </TabsContent>)}
     </Tabs>
   </section>;

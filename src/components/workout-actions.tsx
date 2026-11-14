@@ -25,8 +25,8 @@ export function WorkoutActions({ workout }: { workout: Workout }) {
     else toast.info(`${workout.name} is already saved.`);
   }
 
-  return <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-    <Button onClick={handlePlan} disabled={!hydrated || planned || full} size="lg" className="flex-1"><Plus size={18} /> {planned ? "In today's plan" : full ? "Plan is full" : "Add to today's plan"}</Button>
-    <Button onClick={handleSave} disabled={!hydrated || saved} variant="outline" size="lg" className="flex-1"><Bookmark size={18} fill={saved ? "currentColor" : "none"} /> {saved ? "Saved for later" : "Save for later"}</Button>
+  return <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+    <Button onClick={handlePlan} disabled={!hydrated || planned || full} className="h-11 w-full rounded-xl px-6 text-sm font-semibold sm:w-auto"><Plus size={16} /> {planned ? "In today's plan" : full ? "Plan is full" : "Add to today's plan"}</Button>
+    <Button onClick={handleSave} disabled={!hydrated || saved} variant="outline" className="h-[46px] w-full rounded-xl px-6 text-sm font-medium sm:w-auto"><Bookmark size={16} fill={saved ? "currentColor" : "none"} /> {saved ? "Saved for later" : "Save for later"}</Button>
   </div>;
 }
