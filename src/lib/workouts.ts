@@ -35,7 +35,7 @@ export class WorkoutFetchError extends Error {
   }
 }
 
-async function request(path = ""): Promise<unknown> {
+async function request<T>(path: string, validate: (value: unknown) => value is T): Promise<T> {
   let missing = true;
   for (const source of SOURCES) {
     try {
@@ -45,7 +45,8 @@ async function request(path = ""): Promise<unknown> {
       });
       if (response.status !== 404) missing = false;
       if (!response.ok) continue;
-      return await response.json();
+      const result: unknown = await response.json();
+      if (validate(result)) return result;
     } catch {
       missing = false;
     }
@@ -54,15 +55,14 @@ async function request(path = ""): Promise<unknown> {
 }
 
 export async function getWorkouts(): Promise<Workout[]> {
-  const result = await request();
-  const list = (result as { value?: unknown })?.value;
-  if (!Array.isArray(list) || !list.every(isWorkout)) throw new WorkoutFetchError();
-  return list;
+  const result = await request("", (value): value is { value: Workout[] } => {
+    const list = (value as { value?: unknown } | null)?.value;
+    return Array.isArray(list) && list.every(isWorkout);
+  });
+  return result.value;
 }
 
 export async function getWorkout(id: number): Promise<Workout> {
   if (!Number.isSafeInteger(id) || id < 1) throw new WorkoutFetchError(true);
-  const result = await request(`/${id}`);
-  if (!isWorkout(result) || result.id !== id) throw new WorkoutFetchError(true);
-  return result;
+  return request(`/${id}`, (value): value is Workout => isWorkout(value) && value.id === id);
 }

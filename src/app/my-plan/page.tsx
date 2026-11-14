@@ -47,7 +47,7 @@ export default function MyPlanPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => { if (new URLSearchParams(window.location.search).get("tab") === "saved") setTab("saved"); }, []);
+  useEffect(() => { queueMicrotask(() => { if (new URLSearchParams(window.location.search).get("tab") === "saved") setTab("saved"); }); }, []);
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -64,7 +64,7 @@ export default function MyPlanPage() {
       if (!signal?.aborted) setLoading(false);
     }
   }, []);
-  useEffect(() => { const controller = new AbortController(); void load(controller.signal); return () => controller.abort(); }, [load]);
+  useEffect(() => { const controller = new AbortController(); queueMicrotask(() => { if (!controller.signal.aborted) void load(controller.signal); }); return () => controller.abort(); }, [load]);
 
   const byId = useMemo(() => new Map(workouts.map((workout) => [workout.id, workout])), [workouts]);
   const planned = useMemo(() => planIds.map((id) => byId.get(id)).filter((item): item is Workout => Boolean(item)), [planIds, byId]);

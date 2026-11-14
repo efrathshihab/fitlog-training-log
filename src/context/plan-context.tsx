@@ -28,15 +28,20 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      setPlanIds(cleanIds(stored.planIds).slice(0, 5));
-      setSavedIds(cleanIds(stored.savedIds));
-      setDoneIds(cleanIds(stored.doneIds));
-    } catch {
-      // A corrupt or unavailable local store starts with an empty plan.
-    }
-    setHydrated(true);
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        setPlanIds(cleanIds(stored.planIds).slice(0, 5));
+        setSavedIds(cleanIds(stored.savedIds));
+        setDoneIds(cleanIds(stored.doneIds));
+      } catch {
+        // A corrupt or unavailable local store starts with an empty plan.
+      }
+      setHydrated(true);
+    });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {

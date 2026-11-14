@@ -28,7 +28,7 @@ export default function HomePage() {
     }
   }, []);
 
-  useEffect(() => { const controller = new AbortController(); void load(controller.signal); return () => controller.abort(); }, [load]);
+  useEffect(() => { const controller = new AbortController(); queueMicrotask(() => { if (!controller.signal.aborted) void load(controller.signal); }); return () => controller.abort(); }, [load]);
 
   return <>
     <section className="container-page relative mt-12 flex min-h-[448px] flex-col overflow-hidden rounded-sm border border-[#2a2e36] bg-[#15171d] lg:flex-row lg:items-center">
