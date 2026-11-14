@@ -15,7 +15,7 @@ type Tab = "plan" | "saved";
 type SortKey = "duration" | "calories" | "rating";
 
 function PlanRow({ workout, tab, onDone, onRemove }: { workout: Workout; tab: Tab; onDone: (workout: Workout) => void; onRemove: (workout: Workout) => void }) {
-  return <article className="flex flex-col gap-4 rounded-2xl border border-[#232732] bg-[#14171e] p-4 sm:grid sm:grid-cols-[144px_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-2 lg:flex lg:min-h-[114px] lg:items-center lg:gap-4">
+  return <article className="flex flex-col gap-4 rounded-2xl border border-[#232732] bg-[#14171e] p-4 sm:grid sm:grid-cols-[144px_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-2 lg:flex lg:min-h-[114px] lg:flex-row lg:items-center lg:gap-4">
     <div className="image-panel relative h-44 w-full shrink-0 rounded-xl sm:h-20 sm:w-36"><Image src={workout.image} alt={`${workout.name} exercise`} fill unoptimized sizes="(max-width: 640px) 100vw, 144px" className="object-cover" /></div>
     <div className="min-w-0 flex-1">
       <h3 className="font-display text-base font-bold uppercase leading-6">{workout.name}</h3>
